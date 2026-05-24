@@ -70,7 +70,9 @@ fn create_helper_project(root: &Path) -> Result<PathBuf, Box<dyn Error>> {
     }
 
     patch_w2c2_out_c(&repo_root.join("w2c2-sys/src/out.c"))?;
-    patch_w2c2_str_h(&repo_root.join("w2c2-sys/w2c2/w2c2/str.h"))?;
+    if std::env::consts::OS == "linux" {
+        patch_w2c2_str_h(&repo_root.join("w2c2-sys/w2c2/w2c2/str.h"))?;
+    }
 
     let cargo_toml = format!(
         r#"[package]
@@ -98,8 +100,8 @@ fn patch_w2c2_out_c(path: &Path) -> Result<(), Box<dyn Error>> {
 
 fn patch_w2c2_str_h(path: &Path) -> Result<(), Box<dyn Error>> {
     let mut content = fs::read_to_string(path)?;
-    content = content.replace("inline char* strdup(", "static inline char* strdup(");
-    content = content.replace("inline char *strdup(", "static inline char *strdup(");
+    content = content.replace("char *strdup(const char *s) {", "static inline char *strdup(const char *s) {");
+    content = content.replace("char*strdup(const char *s) {", "static inline char*strdup(const char *s) {");
     fs::write(path, content)?;
     Ok(())
 }
