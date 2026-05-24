@@ -19,7 +19,8 @@ fn main() {
     let output_path = std::path::Path::new(BITMAP_PATH);
     if output_path.exists() {
         if build_native_support {
-            build_ffi_bench_support(&target).expect("failed to build ffi-vs-rust benchmark support");
+            build_ffi_bench_support(&target)
+                .expect("failed to build ffi-vs-rust benchmark support");
         }
         return;
     }

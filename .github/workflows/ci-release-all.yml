@@ -24,6 +24,12 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
+      - name: Check Rust formatting (root)
+        run: cargo fmt --all -- --check
+
+      - name: Check Rust formatting (ffi)
+        run: cargo fmt --manifest-path ffi/Cargo.toml --all -- --check
+
       - name: Build release-all target
         run: cargo release-all
 
