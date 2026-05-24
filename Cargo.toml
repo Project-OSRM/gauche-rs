@@ -9,6 +9,13 @@ crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 
+[dev-dependencies]
+criterion = "0.8.2"
+
+[[bench]]
+name = "queries"
+harness = false
+
 [profile.release]
 opt-level = "z"
 lto = true
