@@ -18,7 +18,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let build_status = Command::new("cargo")
-        .args(["build", "--release", "--target", "wasm32-unknown-unknown", "--lib"])
+        .args([
+            "build",
+            "--release",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--lib",
+            "--features",
+            "web-wasm",
+        ])
         .current_dir(root)
         .status()?;
     if !build_status.success() {
@@ -50,10 +58,7 @@ fn gzip_bytes(input: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         .stdout(Stdio::piped())
         .spawn()?;
     {
-        let stdin = child
-            .stdin
-            .as_mut()
-            .ok_or("failed to open gzip stdin")?;
+        let stdin = child.stdin.as_mut().ok_or("failed to open gzip stdin")?;
         stdin.write_all(input)?;
     }
     let output = child.wait_with_output()?;

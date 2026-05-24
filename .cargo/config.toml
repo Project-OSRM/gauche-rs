@@ -1,2 +1,4 @@
 [alias]
 web = "run --quiet --bin web-build --"
+generate-c = "run --quiet --bin generate-c --"
+release-all = "run --quiet --bin release-all --"

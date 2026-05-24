@@ -113,17 +113,13 @@ impl DrivingAreaIndex {
         Self::default_index()?.classify_point(point)
     }
 
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
     #[unsafe(no_mangle)]
     pub extern "C" fn initialize_index_wasm() -> i32 {
-        if Self::default_index().is_ok() {
-            0
-        } else {
-            -1
-        }
+        if Self::default_index().is_ok() { 0 } else { -1 }
     }
 
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
     #[unsafe(no_mangle)]
     pub extern "C" fn classify_point_wasm(lat: f64, lon: f64) -> i32 {
         match Self::classify_point_default(Point::new(lat, lon)) {

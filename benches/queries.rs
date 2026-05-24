@@ -1,13 +1,14 @@
-use std::sync::OnceLock;
 use std::hint::black_box;
+use std::sync::OnceLock;
 
-use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use gauche::{Bbox, DrivingAreaIndex, Line, Point};
 
 static INDEX: OnceLock<DrivingAreaIndex> = OnceLock::new();
 
 fn index() -> &'static DrivingAreaIndex {
-    INDEX.get_or_init(|| DrivingAreaIndex::from_default_osm().expect("failed to load default index"))
+    INDEX
+        .get_or_init(|| DrivingAreaIndex::from_default_osm().expect("failed to load default index"))
 }
 
 fn point_cases() -> [(&'static str, Point); 3] {
@@ -30,7 +31,10 @@ fn line_cases() -> [(&'static str, Line); 3] {
         ),
         (
             "partial",
-            Line::new(vec![Point::new(22.5293, 114.0823), Point::new(22.60, 114.20)]),
+            Line::new(vec![
+                Point::new(22.5293, 114.0823),
+                Point::new(22.60, 114.20),
+            ]),
         ),
     ]
 }
@@ -50,7 +54,9 @@ fn bench_points(c: &mut Criterion) {
     for (name, point) in point_cases() {
         group.bench_function(name, |b| {
             b.iter(|| {
-                black_box(index).classify_point(black_box(point)).expect("point classification")
+                black_box(index)
+                    .classify_point(black_box(point))
+                    .expect("point classification")
             });
         });
     }
@@ -66,7 +72,11 @@ fn bench_lines(c: &mut Criterion) {
         group.bench_function(name, |b| {
             b.iter_batched(
                 || line.clone(),
-                |line| black_box(index).classify_line(black_box(line)).expect("line classification"),
+                |line| {
+                    black_box(index)
+                        .classify_line(black_box(line))
+                        .expect("line classification")
+                },
                 BatchSize::SmallInput,
             );
         });
@@ -82,7 +92,9 @@ fn bench_bboxes(c: &mut Criterion) {
     for (name, bbox) in bbox_cases() {
         group.bench_function(name, |b| {
             b.iter(|| {
-                black_box(index).classify_bbox(black_box(bbox)).expect("bbox classification")
+                black_box(index)
+                    .classify_bbox(black_box(bbox))
+                    .expect("bbox classification")
             });
         });
     }
