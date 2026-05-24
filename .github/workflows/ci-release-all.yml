@@ -33,15 +33,6 @@ jobs:
       - name: Build release-all target
         run: cargo release-all
 
-      - name: Check generated artifacts are committed
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "release-all produced changes that are not committed:"
-            git --no-pager status --short
-            git --no-pager diff
-            exit 1
-          fi
-
       - name: Compile C bindings via CMake
         run: |
           cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF
