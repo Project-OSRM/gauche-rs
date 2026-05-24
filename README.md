@@ -9,11 +9,12 @@ Left-hand-driving area classifier for `Point`, `Line`, and `Bbox` queries over `
 | Library | `cargo test` / `cargo build` | Core Rust classifier API |
 | CLI | `cargo run -- point <lat> <lon>` | Query a point, line, or bbox from the terminal |
 | web | `cargo web` | Single-file wasm viewer with click classification |
-| bench | `cargo bench` | Criterion benchmarks for point/line/bbox queries |
+| bench | `cargo bench --bench ffi-vs-rust` | Criterion ffi-vs-rust comparison for point/line/bbox queries |
 | FFI wasm | `cargo build --manifest-path ffi/Cargo.toml --target wasm32-unknown-unknown --release` | Opaque-handle wasm API for C/C++ consumers |
 | generate-c | `cargo generate-c` | Regenerate checked-in `c/gauche_ffi.c` and `c/gauche_ffi.h` from wasm via w2c2 |
 | C++ wrapper | `cmake -S cpp -B cpp/build && cmake --build cpp/build` | Consumable C++ library and example over the checked-in C FFI |
 | release-all | `cargo release-all` | Rebuild release targets, then regenerate `c/` and `dist/` artifacts |
+| ffi vs Rust bench | `cargo bench --bench ffi-vs-rust` | Criterion comparison between the Rust core and the generated C API used by the wrapper |
 
 ## Query semantics
 
@@ -41,5 +42,6 @@ cargo run -- bbox 49.0 -5.0 55.0 2.0
 - `src/bin/web-build.rs` — web target generator
 - `src/bin/generate-c.rs` — wasm-to-C generator
 - `ffi/` — wasm FFI crate
-- `benches/queries.rs` — Criterion benchmarks
+- `benches/ffi-vs-rust.rs` — Root ffi-vs-rust Criterion benchmark
 - `cpp/` — CMake-based C++ wrapper and example
+- `benchmarks/ffi-vs-rust/` — Standalone ffi-vs-rust benchmark package

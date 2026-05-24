@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 project(gauche_cpp VERSION 0.1.0 LANGUAGES C CXX)
 
 option(GAUCHE_BUILD_EXAMPLES "Build the C++ example" ON)
+option(GAUCHE_ENABLE_LTO "Enable link-time optimization" ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,6 +27,10 @@ add_library(gauche_cpp
   ${GAUCHE_IMPL_SOURCES}
   ${GAUCHE_W2C2_SOURCES}
 )
+
+if(GAUCHE_ENABLE_LTO)
+  set_property(TARGET gauche_cpp PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+endif()
 
 target_include_directories(gauche_cpp
   PUBLIC

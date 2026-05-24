@@ -1,5 +1,9 @@
 use std::collections::HashMap;
+use std::env;
+use std::error::Error;
 use std::fs;
+use std::path::PathBuf;
+use std::process::Command;
 
 const GRID_STEP: f64 = 0.1;
 const LAT_CELLS: usize = 1800;
@@ -12,6 +16,7 @@ fn main() {
     println!("cargo:rerun-if-changed={BITMAP_PATH}");
     let output_path = std::path::Path::new(BITMAP_PATH);
     if output_path.exists() {
+        build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
         return;
     }
     if let Some(parent) = output_path.parent() {
@@ -24,6 +29,47 @@ fn main() {
     let states = build_bitmap_states(&polygons);
     let packed = pack_states(&states);
     fs::write(output_path, packed).expect("failed to write bitmap.bin");
+    build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+}
+
+fn build_ffi_bench_support() -> Result<(), Box<dyn Error>> {
+    let repo_root = PathBuf::from(env::var("CARGO_MANIFEST_DIR")?);
+    let cpp_dir = repo_root.join("cpp");
+    let build_dir = repo_root.join("target/ffi-bench-build");
+
+    println!("cargo:rerun-if-changed={}", cpp_dir.display());
+    println!("cargo:rerun-if-changed={}", repo_root.join("c").display());
+
+    let status = Command::new("cmake")
+        .args([
+            "-S",
+            cpp_dir.to_str().ok_or("invalid cpp path")?,
+            "-B",
+            build_dir.to_str().ok_or("invalid build path")?,
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE=ON",
+            "-DGAUCHE_BUILD_EXAMPLES=OFF",
+        ])
+        .status()?;
+    if !status.success() {
+        return Err("cmake configure failed".into());
+    }
+
+    let status = Command::new("cmake")
+        .args([
+            "--build",
+            build_dir.to_str().ok_or("invalid build path")?,
+            "-j2",
+        ])
+        .status()?;
+    if !status.success() {
+        return Err("cmake build failed".into());
+    }
+
+    println!("cargo:rustc-link-search=native={}", build_dir.display());
+    println!("cargo:rustc-link-lib=static=gauche_cpp");
+    println!("cargo:rustc-link-lib=c++");
+    Ok(())
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

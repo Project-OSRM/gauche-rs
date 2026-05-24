@@ -16,6 +16,10 @@ crate-type = ["rlib", "cdylib"]
 criterion = "0.8.2"
 
 [[bench]]
+name = "ffi-vs-rust"
+harness = false
+
+[[bench]]
 name = "queries"
 harness = false
 
@@ -23,5 +27,4 @@ harness = false
 opt-level = "z"
 lto = true
 codegen-units = 1
-panic = "abort"
 strip = true
