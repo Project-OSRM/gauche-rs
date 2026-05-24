@@ -48,17 +48,28 @@ Then include:
 
 ### Option 2: Installed artifacts
 
-`cpp/CMakeLists.txt` installs headers, library, and exported targets:
+`cpp/CMakeLists.txt` installs headers, library, and exported targets.
 
+For single-config generators (Ninja/Unix Makefiles):
 ```bash
-cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF
-cmake --build cpp/build --config Release
+cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release
+cmake --build cpp/build
 cmake --install cpp/build --prefix /your/prefix
 ```
 
-The exported targets file is installed under:
+For multi-config generators (Visual Studio/Xcode):
+```bash
+cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF
+cmake --build cpp/build --config Release
+cmake --install cpp/build --prefix /your/prefix --config Release
+```
 
-`/your/prefix/lib/cmake/gauche/`
+The install currently exports targets but does not provide a `gaucheConfig.cmake`, so use:
+
+```cmake
+include("/your/prefix/lib/cmake/gauche/gaucheCppTargets.cmake")
+target_link_libraries(my_app PRIVATE gauche::gauche_cpp)
+```
 
 ## Generated artifacts
 

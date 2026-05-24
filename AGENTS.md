@@ -25,7 +25,7 @@ This repository builds and ships `gauche-rs`: a left-hand-driving classifier wit
    - `cargo web`
 6. Full release pipeline check:
    - `cargo release-all`
-7. Commit with a Conventional Commit title.
+7. Use Conventional Commit style for commits, and ensure the PR title follows Conventional Commits (CI-enforced).
 
 ## Canonical commands
 
