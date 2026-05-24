@@ -29,6 +29,37 @@ cargo run -- line 51.5 -0.1 52.0 0.2
 cargo run -- bbox 49.0 -5.0 55.0 2.0
 ```
 
+## Using the C++ library from CMake
+
+### Option 1: Vendored (recommended)
+
+If your project vendors this repository, add the `cpp/` directory and link the target:
+
+```cmake
+add_subdirectory(path/to/gauche-rs/cpp)
+target_link_libraries(my_app PRIVATE gauche::cpp)
+```
+
+Then include:
+
+```cpp
+#include <gauche/gauche.hpp>
+```
+
+### Option 2: Installed artifacts
+
+`cpp/CMakeLists.txt` installs headers, library, and exported targets:
+
+```bash
+cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF
+cmake --build cpp/build --config Release
+cmake --install cpp/build --prefix /your/prefix
+```
+
+The exported targets file is installed under:
+
+`/your/prefix/lib/cmake/gauche/`
+
 ## Generated artifacts
 
 - `preprocessed/bitmap.bin` stores the 0.1° bitmap used at runtime.
