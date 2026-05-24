@@ -100,8 +100,7 @@ fn patch_w2c2_out_c(path: &Path) -> Result<(), Box<dyn Error>> {
 
 fn patch_w2c2_str_h(path: &Path) -> Result<(), Box<dyn Error>> {
     let mut content = fs::read_to_string(path)?;
-    content = content.replace("char *strdup(const char *s) {", "static inline char *strdup(const char *s) {");
-    content = content.replace("char*strdup(const char *s) {", "static inline char*strdup(const char *s) {");
+    content = content.replace("#if !HAS_STRDUP", "#if 0 /* gauche: use libc strdup */");
     fs::write(path, content)?;
     Ok(())
 }
