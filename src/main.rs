@@ -57,24 +57,24 @@ fn run() -> Result<(), String> {
                 parse_f64(&args[2], "max_lat")?,
                 parse_f64(&args[3], "max_lon")?,
             );
-            index
-                .classify_bbox(bbox)
-                .map_err(|e| e.to_string())?
+            index.classify_bbox(bbox).map_err(|e| e.to_string())?
         }
         _ => return Err(usage()),
     };
 
-    println!("{}", match classification {
-        gauche::Classification::Yes => "yes",
-        gauche::Classification::No => "no",
-        gauche::Classification::Partially => "partially",
-    });
+    println!(
+        "{}",
+        match classification {
+            gauche::Classification::Yes => "yes",
+            gauche::Classification::No => "no",
+            gauche::Classification::Partially => "partially",
+        }
+    );
     Ok(())
 }
 
 fn parse_f64(s: &str, name: &str) -> Result<f64, String> {
-    s.parse::<f64>()
-        .map_err(|e| format!("invalid {name}: {e}"))
+    s.parse::<f64>().map_err(|e| format!("invalid {name}: {e}"))
 }
 
 fn usage() -> String {

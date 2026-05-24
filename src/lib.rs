@@ -3,6 +3,7 @@ use std::f64::consts::PI;
 use std::fmt;
 use std::fs;
 use std::path::Path;
+use std::sync::OnceLock;
 
 const GRID_STEP: f64 = 0.1;
 const LAT_CELLS: usize = 1800;
@@ -92,11 +93,45 @@ pub struct DrivingAreaIndex {
     bitmap: Bitmap,
 }
 
+static DEFAULT_INDEX: OnceLock<Result<DrivingAreaIndex, Error>> = OnceLock::new();
+
 impl DrivingAreaIndex {
     pub fn from_osm_path(path: impl AsRef<Path>) -> Result<Self, Error> {
         let content = fs::read_to_string(path.as_ref())
             .map_err(|e| Error::Io(format!("failed to read {}: {e}", path.as_ref().display())))?;
         Self::from_osm_str(&content)
+    }
+
+    fn default_index() -> Result<&'static DrivingAreaIndex, Error> {
+        match DEFAULT_INDEX.get_or_init(DrivingAreaIndex::from_default_osm) {
+            Ok(index) => Ok(index),
+            Err(err) => Err(err.clone()),
+        }
+    }
+
+    pub fn classify_point_default(point: Point) -> Result<Classification, Error> {
+        Self::default_index()?.classify_point(point)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[unsafe(no_mangle)]
+    pub extern "C" fn initialize_index_wasm() -> i32 {
+        if Self::default_index().is_ok() {
+            0
+        } else {
+            -1
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[unsafe(no_mangle)]
+    pub extern "C" fn classify_point_wasm(lat: f64, lon: f64) -> i32 {
+        match Self::classify_point_default(Point::new(lat, lon)) {
+            Ok(Classification::Yes) => 1,
+            Ok(Classification::No) => 0,
+            Ok(Classification::Partially) => 2,
+            Err(_) => -1,
+        }
     }
 
     pub fn from_default_osm() -> Result<Self, Error> {
@@ -509,7 +544,13 @@ impl CellRect {
         let edge_hit = polygon_intersects_cell_planar(poly, self);
         if inside == 4 && !edge_hit {
             CellRelation::Inside
-        } else if inside > 0 || edge_hit || poly.planar_vertices.iter().any(|&v| self.contains(v, poly.ref_lon)) {
+        } else if inside > 0
+            || edge_hit
+            || poly
+                .planar_vertices
+                .iter()
+                .any(|&v| self.contains(v, poly.ref_lon))
+        {
             CellRelation::Crossing
         } else {
             CellRelation::Outside
@@ -539,7 +580,11 @@ fn polygon_intersects_cell_planar(poly: &Polygon, cell: CellRect) -> bool {
         (corners[2], corners[3]),
         (corners[3], corners[0]),
     ];
-    let mut polygon_edges = poly.planar_vertices.windows(2).map(|w| (w[0], w[1])).collect::<Vec<_>>();
+    let mut polygon_edges = poly
+        .planar_vertices
+        .windows(2)
+        .map(|w| (w[0], w[1]))
+        .collect::<Vec<_>>();
     if let Some(&first) = poly.planar_vertices.first() {
         if let Some(&last) = poly.planar_vertices.last() {
             polygon_edges.push((last, first));
@@ -552,7 +597,11 @@ fn polygon_intersects_cell_planar(poly: &Polygon, cell: CellRect) -> bool {
             }
         }
     }
-    if poly.planar_vertices.iter().any(|&v| cell.contains(v, poly.ref_lon)) {
+    if poly
+        .planar_vertices
+        .iter()
+        .any(|&v| cell.contains(v, poly.ref_lon))
+    {
         return true;
     }
     corners.iter().any(|&c| planar_point_in_polygon(c, poly))
@@ -588,7 +637,12 @@ fn point_on_segment_planar(p: PlanarPoint, a: PlanarPoint, b: PlanarPoint) -> bo
     dot <= 1e-9
 }
 
-fn planar_segments_intersect(a1: PlanarPoint, a2: PlanarPoint, b1: PlanarPoint, b2: PlanarPoint) -> bool {
+fn planar_segments_intersect(
+    a1: PlanarPoint,
+    a2: PlanarPoint,
+    b1: PlanarPoint,
+    b2: PlanarPoint,
+) -> bool {
     fn orient(a: PlanarPoint, b: PlanarPoint, c: PlanarPoint) -> f64 {
         (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
     }
@@ -638,7 +692,11 @@ fn segment_relation(a: Point, b: Point, polygons: &[Polygon]) -> Result<SegmentR
     }
 }
 
-fn segment_intersects_any_boundary(a: Point, b: Point, polygons: &[Polygon]) -> Result<bool, Error> {
+fn segment_intersects_any_boundary(
+    a: Point,
+    b: Point,
+    polygons: &[Polygon],
+) -> Result<bool, Error> {
     let va = Vec3::from_point(a);
     let vb = Vec3::from_point(b);
     for poly in polygons {
@@ -655,7 +713,9 @@ fn segment_intersects_any_boundary(a: Point, b: Point, polygons: &[Polygon]) -> 
 }
 
 fn point_in_any_polygon_spherical(point: Point, polygons: &[Polygon]) -> bool {
-    polygons.iter().any(|poly| point_in_polygon_spherical(point, poly))
+    polygons
+        .iter()
+        .any(|poly| point_in_polygon_spherical(point, poly))
 }
 
 fn point_in_polygon_spherical(point: Point, poly: &Polygon) -> bool {
@@ -735,7 +795,9 @@ fn spherical_segments_intersect(a: Vec3, b: Vec3, c: Vec3, d: Vec3) -> Result<bo
     if intersection.norm() < EPS {
         return Ok(false);
     }
-    let x1 = intersection.normalized().ok_or_else(|| Error::InvalidGeometry("failed to normalize intersection".into()))?;
+    let x1 = intersection
+        .normalized()
+        .ok_or_else(|| Error::InvalidGeometry("failed to normalize intersection".into()))?;
     let x2 = x1.scale(-1.0);
     Ok(on_both_minor_arcs(a, b, c, d, x1) || on_both_minor_arcs(a, b, c, d, x2))
 }
@@ -846,7 +908,12 @@ fn polygon_edges_intersect_bbox(polygons: &[Polygon], bbox: Bbox) -> Result<bool
                 }
             }
             if let (Some(&first), Some(&last)) = (ring3.first(), ring3.last()) {
-                if spherical_segments_intersect(a, b, Vec3::from_point(last), Vec3::from_point(first))? {
+                if spherical_segments_intersect(
+                    a,
+                    b,
+                    Vec3::from_point(last),
+                    Vec3::from_point(first),
+                )? {
                     return Ok(true);
                 }
             }
@@ -870,7 +937,9 @@ fn validate_point(point: Point) -> Result<(), Error> {
 
 fn validate_line(line: &Line) -> Result<(), Error> {
     if line.points.is_empty() {
-        return Err(Error::InvalidGeometry("line must contain at least one point".into()));
+        return Err(Error::InvalidGeometry(
+            "line must contain at least one point".into(),
+        ));
     }
     for p in &line.points {
         validate_point(*p)?;
@@ -907,7 +976,9 @@ fn parse_osm_polygons(input: &str) -> Result<Vec<Polygon>, Error> {
                 return Err(Error::Parse("nd outside of way".into()));
             }
         } else if line.starts_with("</way>") {
-            let refs = current_way.take().ok_or_else(|| Error::Parse("unexpected </way>".into()))?;
+            let refs = current_way
+                .take()
+                .ok_or_else(|| Error::Parse("unexpected </way>".into()))?;
             let mut points = Vec::with_capacity(refs.len());
             for ref_id in refs {
                 let point = nodes
@@ -928,7 +999,9 @@ fn parse_osm_polygons(input: &str) -> Result<Vec<Polygon>, Error> {
 
 fn polygon_from_ring(mut points: Vec<Point>) -> Result<Polygon, Error> {
     if points.len() < 3 {
-        return Err(Error::InvalidGeometry("polygon ring needs at least 3 points".into()));
+        return Err(Error::InvalidGeometry(
+            "polygon ring needs at least 3 points".into(),
+        ));
     }
     if points.first() != points.last() {
         points.push(*points.first().unwrap());
@@ -1051,7 +1124,6 @@ fn cell_indices(lat: f64, lon: f64) -> Result<(usize, usize), Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::OnceLock;
 
     static INDEX: OnceLock<DrivingAreaIndex> = OnceLock::new();
 
@@ -1110,7 +1182,10 @@ mod tests {
     #[test]
     fn line_crossing_area_is_partial() {
         let idx = index();
-        let line = Line::new(vec![Point::new(22.5293, 114.0823), Point::new(22.60, 114.20)]);
+        let line = Line::new(vec![
+            Point::new(22.5293, 114.0823),
+            Point::new(22.60, 114.20),
+        ]);
         assert_eq!(idx.classify_line(line).unwrap(), Classification::Partially);
     }
 
@@ -1148,7 +1223,10 @@ mod tests {
         let idx = index();
         let p = Point::new(51.5074, -0.1278);
         let line = Line::new(vec![p]);
-        assert_eq!(idx.classify_line(line).unwrap(), idx.classify_point(p).unwrap());
+        assert_eq!(
+            idx.classify_line(line).unwrap(),
+            idx.classify_point(p).unwrap()
+        );
     }
 
     #[test]
@@ -1156,7 +1234,10 @@ mod tests {
         let idx = index();
         let p = Point::new(51.5074, -0.1278);
         let bbox = Bbox::new(p.lat, p.lon, p.lat, p.lon);
-        assert_eq!(idx.classify_bbox(bbox).unwrap(), idx.classify_point(p).unwrap());
+        assert_eq!(
+            idx.classify_bbox(bbox).unwrap(),
+            idx.classify_point(p).unwrap()
+        );
     }
 
     #[test]
@@ -1168,7 +1249,8 @@ mod tests {
 
     #[test]
     fn osm_parser_rejects_missing_node() {
-        let bad = "<osm><node id='1' lat='0' lon='0'/><way id='2'><nd ref='1'/><nd ref='2'/></way></osm>";
+        let bad =
+            "<osm><node id='1' lat='0' lon='0'/><way id='2'><nd ref='1'/><nd ref='2'/></way></osm>";
         assert!(parse_osm_polygons(bad).is_err());
     }
 

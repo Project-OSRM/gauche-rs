@@ -207,7 +207,12 @@ fn cell_relation(cell: CellRect, poly: &Polygon) -> CellRelation {
     let edge_hit = polygon_intersects_cell_planar(poly, cell);
     if inside == 4 && !edge_hit {
         CellRelation::Inside
-    } else if inside > 0 || edge_hit || poly.planar_vertices.iter().any(|&v| cell.contains(v, poly.ref_lon))
+    } else if inside > 0
+        || edge_hit
+        || poly
+            .planar_vertices
+            .iter()
+            .any(|&v| cell.contains(v, poly.ref_lon))
     {
         CellRelation::Crossing
     } else {
@@ -228,7 +233,8 @@ fn polygon_intersects_cell_planar(poly: &Polygon, cell: CellRect) -> bool {
         .windows(2)
         .map(|w| (w[0], w[1]))
         .collect::<Vec<_>>();
-    if let (Some(&first), Some(&last)) = (poly.planar_vertices.first(), poly.planar_vertices.last()) {
+    if let (Some(&first), Some(&last)) = (poly.planar_vertices.first(), poly.planar_vertices.last())
+    {
         polygon_edges.push((last, first));
     }
     for &(a, b) in &edges {
@@ -238,7 +244,11 @@ fn polygon_intersects_cell_planar(poly: &Polygon, cell: CellRect) -> bool {
             }
         }
     }
-    if poly.planar_vertices.iter().any(|&v| cell.contains(v, poly.ref_lon)) {
+    if poly
+        .planar_vertices
+        .iter()
+        .any(|&v| cell.contains(v, poly.ref_lon))
+    {
         return true;
     }
     corners.iter().any(|&c| planar_point_in_polygon(c, poly))
@@ -274,7 +284,12 @@ fn point_on_segment_planar(p: PlanarPoint, a: PlanarPoint, b: PlanarPoint) -> bo
     dot <= 1e-9
 }
 
-fn planar_segments_intersect(a1: PlanarPoint, a2: PlanarPoint, b1: PlanarPoint, b2: PlanarPoint) -> bool {
+fn planar_segments_intersect(
+    a1: PlanarPoint,
+    a2: PlanarPoint,
+    b1: PlanarPoint,
+    b2: PlanarPoint,
+) -> bool {
     fn orient(a: PlanarPoint, b: PlanarPoint, c: PlanarPoint) -> f64 {
         (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
     }
