@@ -3,12 +3,12 @@
 version = 4
 
 [[package]]
-name = "gauche"
-version = "0.1.0"
-
-[[package]]
 name = "gauche-ffi"
 version = "0.1.0"
 dependencies = [
- "gauche",
+ "gauche-rs",
 ]
+
+[[package]]
+name = "gauche-rs"
+version = "0.1.0"

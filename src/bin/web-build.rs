@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Err("failed to compile wasm library".into());
     }
 
-    let wasm_file = root.join("target/wasm32-unknown-unknown/release/gauche.wasm");
+    let wasm_file = root.join("target/wasm32-unknown-unknown/release/gauche_rs.wasm");
     if !wasm_file.exists() {
         return Err(format!("missing wasm output: {}", wasm_file.display()).into());
     }
@@ -41,13 +41,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let wasm_gzip = gzip_bytes(&wasm)?;
     let wasm_b64 = base64_encode(&wasm_gzip);
 
+    let html = HTML_TEMPLATE.replace("__WASM_BASE64__", &wasm_b64);
     let output_dir = root.join("dist");
     fs::create_dir_all(&output_dir)?;
-    let output_file = output_dir.join("gauche-wasm-map.html");
-
-    let html = HTML_TEMPLATE.replace("__WASM_BASE64__", &wasm_b64);
-    fs::write(&output_file, html)?;
-    println!("Wrote {}", output_file.display());
+    let outputs = [output_dir.join("gauche-wasm-map.html")];
+    for output_file in outputs {
+        fs::write(&output_file, &html)?;
+        println!("Wrote {}", output_file.display());
+    }
     Ok(())
 }
 

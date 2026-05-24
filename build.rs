@@ -14,9 +14,13 @@ const BITMAP_PATH: &str = "preprocessed/bitmap.bin";
 fn main() {
     println!("cargo:rerun-if-changed=left-right-hand-traffic.osm");
     println!("cargo:rerun-if-changed={BITMAP_PATH}");
+    let target = env::var("TARGET").unwrap_or_default();
+    let build_native_support = target != "wasm32-unknown-unknown";
     let output_path = std::path::Path::new(BITMAP_PATH);
     if output_path.exists() {
-        build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+        if build_native_support {
+            build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+        }
         return;
     }
     if let Some(parent) = output_path.parent() {
@@ -29,7 +33,9 @@ fn main() {
     let states = build_bitmap_states(&polygons);
     let packed = pack_states(&states);
     fs::write(output_path, packed).expect("failed to write bitmap.bin");
-    build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+    if build_native_support {
+        build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+    }
 }
 
 fn build_ffi_bench_support() -> Result<(), Box<dyn Error>> {

@@ -1,8 +1,9 @@
 [package]
-name = "gauche"
+name = "gauche-rs"
 version = "0.1.0"
 edition = "2024"
 build = "build.rs"
+default-run = "gauche-rs"
 
 [features]
 web-wasm = []

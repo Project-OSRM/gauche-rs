@@ -78,9 +78,9 @@ U32 f29(gauche_ffiInstance*,U32,U32);
 
 void f30(gauche_ffiInstance*,U32,U32,U32);
 
-void f31(gauche_ffiInstance*,U32);
+void f31(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
 
-void f32(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
+void f32(gauche_ffiInstance*,U32);
 
 void f33(gauche_ffiInstance*,U32);
 

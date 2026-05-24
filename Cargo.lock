@@ -221,7 +221,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "gauche"
+name = "gauche-rs"
 version = "0.1.0"
 dependencies = [
  "criterion",

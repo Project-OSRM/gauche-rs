@@ -1,6 +1,6 @@
 use std::slice;
 
-use gauche::{Bbox, Classification, DrivingAreaIndex, Line, Point};
+use gauche_rs::{Bbox, Classification, DrivingAreaIndex, Line, Point};
 
 pub type GaucheHandle = u32;
 
@@ -75,7 +75,7 @@ pub extern "C" fn gauche_classify_point(
             write_classification(out_classification, classification);
             GAUCHE_STATUS_OK
         }
-        Err(gauche::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
+        Err(gauche_rs::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
         Err(_) => GAUCHE_STATUS_INTERNAL_ERROR,
     }
 }
@@ -104,7 +104,7 @@ pub extern "C" fn gauche_classify_bbox(
             write_classification(out_classification, classification);
             GAUCHE_STATUS_OK
         }
-        Err(gauche::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
+        Err(gauche_rs::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
         Err(_) => GAUCHE_STATUS_INTERNAL_ERROR,
     }
 }
@@ -142,7 +142,7 @@ pub extern "C" fn gauche_classify_line(
             write_classification(out_classification, classification);
             GAUCHE_STATUS_OK
         }
-        Err(gauche::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
+        Err(gauche_rs::Error::InvalidGeometry(_)) => GAUCHE_STATUS_INVALID_INPUT,
         Err(_) => GAUCHE_STATUS_INTERNAL_ERROR,
     }
 }

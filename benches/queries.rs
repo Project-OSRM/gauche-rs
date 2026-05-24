@@ -2,7 +2,7 @@ use std::hint::black_box;
 use std::sync::OnceLock;
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use gauche::{Bbox, DrivingAreaIndex, Line, Point};
+use gauche_rs::{Bbox, DrivingAreaIndex, Line, Point};
 
 static INDEX: OnceLock<DrivingAreaIndex> = OnceLock::new();
 

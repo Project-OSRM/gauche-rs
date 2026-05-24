@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use gauche::{Bbox, DrivingAreaIndex, Line, Point};
+use gauche_rs::{Bbox, DrivingAreaIndex, Line, Point};
 
 fn main() -> ExitCode {
     match run() {
@@ -65,9 +65,9 @@ fn run() -> Result<(), String> {
     println!(
         "{}",
         match classification {
-            gauche::Classification::Yes => "yes",
-            gauche::Classification::No => "no",
-            gauche::Classification::Partially => "partially",
+            gauche_rs::Classification::Yes => "yes",
+            gauche_rs::Classification::No => "no",
+            gauche_rs::Classification::Partially => "partially",
         }
     );
     Ok(())
@@ -78,5 +78,5 @@ fn parse_f64(s: &str, name: &str) -> Result<f64, String> {
 }
 
 fn usage() -> String {
-    "usage:\n  gauche point <lat> <lon>\n  gauche line <lat1> <lon1> <lat2> <lon2> [<lat3> <lon3> ...]\n  gauche bbox <min_lat> <min_lon> <max_lat> <max_lon>".into()
+    "usage:\n  gauche-rs point <lat> <lon>\n  gauche-rs line <lat1> <lon1> <lat2> <lon2> [<lat3> <lon3> ...]\n  gauche-rs bbox <min_lat> <min_lon> <max_lat> <max_lon>".into()
 }
