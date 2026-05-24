@@ -1,0 +1,39 @@
+name: CI Release All
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  release-all:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Check Rust formatting (root)
+        run: cargo fmt --all -- --check
+
+      - name: Check Rust formatting (ffi)
+        run: cargo fmt --manifest-path ffi/Cargo.toml --all -- --check
+
+      - name: Build release-all target
+        run: cargo release-all
+
+      - name: Compile C bindings via CMake
+        run: |
+          cmake -S cpp -B cpp/build -DGAUCHE_BUILD_EXAMPLES=OFF
+          cmake --build cpp/build --config Release

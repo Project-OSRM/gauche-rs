@@ -19,7 +19,8 @@ fn main() {
     let output_path = std::path::Path::new(BITMAP_PATH);
     if output_path.exists() {
         if build_native_support {
-            build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+            build_ffi_bench_support(&target)
+                .expect("failed to build ffi-vs-rust benchmark support");
         }
         return;
     }
@@ -34,11 +35,11 @@ fn main() {
     let packed = pack_states(&states);
     fs::write(output_path, packed).expect("failed to write bitmap.bin");
     if build_native_support {
-        build_ffi_bench_support().expect("failed to build ffi-vs-rust benchmark support");
+        build_ffi_bench_support(&target).expect("failed to build ffi-vs-rust benchmark support");
     }
 }
 
-fn build_ffi_bench_support() -> Result<(), Box<dyn Error>> {
+fn build_ffi_bench_support(target: &str) -> Result<(), Box<dyn Error>> {
     let repo_root = PathBuf::from(env::var("CARGO_MANIFEST_DIR")?);
     let cpp_dir = repo_root.join("cpp");
     let build_dir = repo_root.join("target/ffi-bench-build");
@@ -74,7 +75,12 @@ fn build_ffi_bench_support() -> Result<(), Box<dyn Error>> {
 
     println!("cargo:rustc-link-search=native={}", build_dir.display());
     println!("cargo:rustc-link-lib=static=gauche_cpp");
-    println!("cargo:rustc-link-lib=c++");
+    let cxx_runtime = if target.contains("linux") {
+        "stdc++"
+    } else {
+        "c++"
+    };
+    println!("cargo:rustc-link-lib={cxx_runtime}");
     Ok(())
 }
 
