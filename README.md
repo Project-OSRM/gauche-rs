@@ -1,6 +1,6 @@
 # gauche-rs
 
-Left-hand-driving area classifier for `Point`, `Line`, and `Bbox` queries over `left-right-hand-traffic.osm`.
+Left-hand traffic area classifier for `Point`, `Line`, and `Bbox` queries over well_known `left-right-hand-traffic.osm`.
 
 ## Targets
 
