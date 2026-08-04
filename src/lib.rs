@@ -113,6 +113,14 @@ impl DrivingAreaIndex {
         Self::default_index()?.classify_point(point)
     }
 
+    pub fn classify_line_default(line: Line) -> Result<Classification, Error> {
+        Self::default_index()?.classify_line(line)
+    }
+
+    pub fn classify_bbox_default(bbox: Bbox) -> Result<Classification, Error> {
+        Self::default_index()?.classify_bbox(bbox)
+    }
+
     #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
     #[unsafe(no_mangle)]
     pub extern "C" fn initialize_index_wasm() -> i32 {
@@ -123,6 +131,44 @@ impl DrivingAreaIndex {
     #[unsafe(no_mangle)]
     pub extern "C" fn classify_point_wasm(lat: f64, lon: f64) -> i32 {
         match Self::classify_point_default(Point::new(lat, lon)) {
+            Ok(Classification::Yes) => 1,
+            Ok(Classification::No) => 0,
+            Ok(Classification::Partially) => 2,
+            Err(_) => -1,
+        }
+    }
+
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
+    #[unsafe(no_mangle)]
+    pub extern "C" fn classify_bbox_wasm(
+        min_lat: f64,
+        min_lon: f64,
+        max_lat: f64,
+        max_lon: f64,
+    ) -> i32 {
+        match Self::classify_bbox_default(Bbox::new(min_lat, min_lon, max_lat, max_lon)) {
+            Ok(Classification::Yes) => 1,
+            Ok(Classification::No) => 0,
+            Ok(Classification::Partially) => 2,
+            Err(_) => -1,
+        }
+    }
+
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
+    #[unsafe(no_mangle)]
+    pub extern "C" fn classify_line_wasm(coords: *const f64, point_count: u32) -> i32 {
+        if coords.is_null() || point_count == 0 {
+            return -1;
+        }
+        let Some(coord_len) = point_count.checked_mul(2) else {
+            return -1;
+        };
+        let coords = unsafe { core::slice::from_raw_parts(coords, coord_len as usize) };
+        let mut points = Vec::with_capacity(point_count as usize);
+        for chunk in coords.chunks_exact(2) {
+            points.push(Point::new(chunk[0], chunk[1]));
+        }
+        match Self::classify_line_default(Line::new(points)) {
             Ok(Classification::Yes) => 1,
             Ok(Classification::No) => 0,
             Ok(Classification::Partially) => 2,

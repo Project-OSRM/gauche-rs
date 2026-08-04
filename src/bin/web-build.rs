@@ -41,6 +41,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     let wasm_gzip = gzip_bytes(&wasm)?;
     let wasm_b64 = base64_encode(&wasm_gzip);
 
+    // Copy the standalone .wasm into pkg/ for the npm package
+    let pkg_dir = root.join("pkg");
+    fs::create_dir_all(&pkg_dir)?;
+    let pkg_wasm = pkg_dir.join("gauche_rs.wasm");
+    fs::write(&pkg_wasm, &wasm)?;
+    println!("Wrote {}", pkg_wasm.display());
+
     let html = HTML_TEMPLATE.replace("__WASM_BASE64__", &wasm_b64);
     let output_dir = root.join("dist");
     fs::create_dir_all(&output_dir)?;
