@@ -12,8 +12,6 @@ wasmModuleInstance common;
 wasmMemory* m0;
 wasmTable t0;
 U32 g0;
-U32 g1;
-U32 g2;
 } gauche_ffiInstance;
 
 U32 f0(gauche_ffiInstance*,U32,F64,F64,F64,F64,U32);
@@ -34,75 +32,75 @@ U32 f7(gauche_ffiInstance*,U32,U32,U32,U32);
 
 void f8(gauche_ffiInstance*);
 
-void f9(gauche_ffiInstance*,U32,U32);
+void f9(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32,U32);
 
-void f10(gauche_ffiInstance*,U32,U32);
+void f10(gauche_ffiInstance*,U32);
 
-void f11(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32,U32);
+void f11(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-void f12(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f12(gauche_ffiInstance*,U32,U32);
 
-U32 f13(gauche_ffiInstance*,U32,U32,U32);
+void f13(gauche_ffiInstance*,U32,U32);
 
-void f14(gauche_ffiInstance*,U32,F64,F64);
+U32 f14(gauche_ffiInstance*,U32,U32,U32);
 
-void f15(gauche_ffiInstance*,U32,U32,U32);
+void f15(gauche_ffiInstance*,U32,F64,F64);
 
-void f16(gauche_ffiInstance*,U32,U32,U32);
+void f16(gauche_ffiInstance*,U32,F64,F64,F64,F64,U32,U32);
 
-void f17(gauche_ffiInstance*,U32,F64,F64,F64,F64,U32,U32);
+U32 f17(gauche_ffiInstance*,F64,F64,U32,U32);
 
-U32 f18(gauche_ffiInstance*,F64,F64,U32,U32);
+void f18(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-void f19(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f19(gauche_ffiInstance*,U32,U32,U32);
 
-void f20(gauche_ffiInstance*,U32,U32,U32);
+void f20(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-void f21(gauche_ffiInstance*,U32,U32,F64,F64);
+void f21(gauche_ffiInstance*,U32,U32,U32,U32);
 
-void f22(gauche_ffiInstance*,U32);
+U32 f22(gauche_ffiInstance*,U32,U32,U32);
 
-void f23(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f23(gauche_ffiInstance*,U32,U32,U32);
 
-void f24(gauche_ffiInstance*,U32,U32,U32,U32);
+void f24(gauche_ffiInstance*,U32,U32,U32);
 
-void f25(gauche_ffiInstance*,U32);
+void f25(gauche_ffiInstance*,U32,U32,F64,F64);
 
-U32 f26(gauche_ffiInstance*,U32,U32,U32);
+void f26(gauche_ffiInstance*,U32);
 
-void f27(gauche_ffiInstance*,U32,U32,U32);
+void f27(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-U32 f28(gauche_ffiInstance*,U32,U32);
+void f28(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-U32 f29(gauche_ffiInstance*,U32,U32);
+void f29(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
 
-void f30(gauche_ffiInstance*,U32,U32,U32);
+void f30(gauche_ffiInstance*,U32,U32,U64,F64,F64);
 
 void f31(gauche_ffiInstance*,U32);
 
-void f32(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
+void f32(gauche_ffiInstance*,U32);
 
 void f33(gauche_ffiInstance*,U32);
 
 void f34(gauche_ffiInstance*,U32);
 
-void f35(gauche_ffiInstance*,U32);
+void f35(gauche_ffiInstance*,U32,U32,U32);
 
-void f36(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+U32 f36(gauche_ffiInstance*,U32,U32);
 
-void f37(gauche_ffiInstance*,U32,U32,U64,F64,F64);
+U32 f37(gauche_ffiInstance*,U32,U32);
 
-void f38(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f38(gauche_ffiInstance*,U32,U32,U32);
 
 U32 f39(gauche_ffiInstance*,U32,U32);
 
-void f40(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f40(gauche_ffiInstance*,U32,U32);
 
-void f41(gauche_ffiInstance*,U32,U32);
+void f41(gauche_ffiInstance*,U32);
 
 void f42(gauche_ffiInstance*,U32);
 
-void f43(gauche_ffiInstance*,U32);
+void f43(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
 void f44(gauche_ffiInstance*,U32);
 
@@ -208,15 +206,15 @@ U32 f94(gauche_ffiInstance*,U32,U32,U32);
 
 void f95(gauche_ffiInstance*,U32,U32,U32);
 
-void f96(gauche_ffiInstance*,U32,U32,U32,U32);
+void f96(gauche_ffiInstance*,U32,U64,U64);
 
-void f97(gauche_ffiInstance*,U32,U64,U64);
+void f97(gauche_ffiInstance*,U32,U32,U32);
 
-void f98(gauche_ffiInstance*,U32,U32,U32);
+U32 f98(gauche_ffiInstance*,U32,U32);
 
-U32 f99(gauche_ffiInstance*,U32,U32);
+U32 f99(gauche_ffiInstance*,U32,U32,U32,U32);
 
-U32 f100(gauche_ffiInstance*,U32,U32,U32,U32);
+void f100(gauche_ffiInstance*,U32,U32,U32,U32);
 
 void f101(gauche_ffiInstance*,U32,U32,U32);
 
@@ -256,55 +254,55 @@ U32 f118(gauche_ffiInstance*,U32,U32);
 
 void f119(gauche_ffiInstance*,U32);
 
-void f120(gauche_ffiInstance*,U32,U32,U32,U32,U32);
+void f120(gauche_ffiInstance*,U32,U32,U32);
 
-U32 f121(gauche_ffiInstance*,U32,U32);
+void f121(gauche_ffiInstance*,U32,U32,U32,U32,U32);
 
-void f122(gauche_ffiInstance*,U32,U32,U32,U32);
+U32 f122(gauche_ffiInstance*,U32,U32);
 
-void f123(gauche_ffiInstance*,U32,U32,U32);
+void f123(gauche_ffiInstance*,U32,U32,U32,U32);
 
 void f124(gauche_ffiInstance*,U32,U32,U32);
 
-U32 f125(gauche_ffiInstance*,U32,U32);
+void f125(gauche_ffiInstance*,U32,U32,U32);
 
-void f126(gauche_ffiInstance*,U32,U32,U32);
+U32 f126(gauche_ffiInstance*,U32,U32);
 
-U32 f127(gauche_ffiInstance*,U32,U32);
+void f127(gauche_ffiInstance*,U32,U32,U32);
 
 U32 f128(gauche_ffiInstance*,U32,U32);
 
-U32 f129(gauche_ffiInstance*,U32,U32,U32);
+U32 f129(gauche_ffiInstance*,U32,U32);
 
 U32 f130(gauche_ffiInstance*,U32,U32,U32);
 
-void f131(gauche_ffiInstance*,U32,U64,U64,U64,U64);
+U32 f131(gauche_ffiInstance*,U32,U32,U32);
 
 void f132(gauche_ffiInstance*,U32,U64,U64,U64,U64);
 
-void f133(gauche_ffiInstance*,U32,U64,U64,U64,U64);
+F64 f133(gauche_ffiInstance*,F64);
 
-F64 f134(gauche_ffiInstance*,F64);
+F64 f134(gauche_ffiInstance*,F64,F64);
 
 F64 f135(gauche_ffiInstance*,F64,F64);
 
-F64 f136(gauche_ffiInstance*,F64,F64);
+U32 f136(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
 
-F64 f137(gauche_ffiInstance*,F64,F64);
+void f137(gauche_ffiInstance*,U32,F64);
 
-void f138(gauche_ffiInstance*,U32,U64,U64,U64,U64);
+F64 f138(gauche_ffiInstance*,F64);
 
-F64 f139(gauche_ffiInstance*,F64,F64);
+F64 f139(gauche_ffiInstance*,F64);
 
-U32 f140(gauche_ffiInstance*,U32,U32,U32,U32,U32,U32);
+void f140(gauche_ffiInstance*,U32,U64,U64,U64,U64);
 
-void f141(gauche_ffiInstance*,U32,F64);
+void f141(gauche_ffiInstance*,U32,U64,U64,U64,U64);
 
-F64 f142(gauche_ffiInstance*,F64);
+U64 f142(gauche_ffiInstance*,U64,U32,U64);
 
-F64 f143(gauche_ffiInstance*,F64);
+F64 f143(gauche_ffiInstance*,F64,F64);
 
-void f144(gauche_ffiInstance*,U32,U64,U64,U32);
+F64 f144(gauche_ffiInstance*,F64,F64);
 
 F64 f145(gauche_ffiInstance*,F64);
 
@@ -316,11 +314,9 @@ F64 f148(gauche_ffiInstance*,F64);
 
 void f149(gauche_ffiInstance*,U32,U64,U64,U32);
 
-U64 f150(gauche_ffiInstance*,U64,U32,U64);
+void f150(gauche_ffiInstance*,U32,U64,U64,U64,U64);
 
-F64 f151(gauche_ffiInstance*,F64,F64);
-
-F64 f152(gauche_ffiInstance*,F64,F64);
+void f151(gauche_ffiInstance*,U32,U64,U64,U32);
 
 wasmMemory*gauche_ffi_memory(gauche_ffiInstance* i);
 
