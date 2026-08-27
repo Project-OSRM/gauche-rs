@@ -15,7 +15,12 @@ fn main() {
     println!("cargo:rerun-if-changed=left-right-hand-traffic.osm");
     println!("cargo:rerun-if-changed={BITMAP_PATH}");
     let target = env::var("TARGET").unwrap_or_default();
-    let build_native_support = target != "wasm32-unknown-unknown";
+    // The ffi-vs-rust bench links a C++ static library built from `cpp/`. That tree is
+    // excluded from the published crate, so downstream builds skip cmake entirely.
+    let cpp_dir_present = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap_or_default())
+        .join("cpp")
+        .is_dir();
+    let build_native_support = target != "wasm32-unknown-unknown" && cpp_dir_present;
     let output_path = std::path::Path::new(BITMAP_PATH);
     if output_path.exists() {
         if build_native_support {

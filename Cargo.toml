@@ -2,8 +2,29 @@
 name = "gauche-rs"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+description = "Left-hand traffic area classifier for point, line, and bbox queries over OSM driving-side data"
+license = "BSD-2-Clause"
+repository = "https://github.com/Project-OSRM/gauche-rs"
+readme = "README.md"
+keywords = ["osm", "geo", "traffic", "gis", "driving-side"]
+categories = ["science::geo", "command-line-utilities"]
 build = "build.rs"
 default-run = "gauche-rs"
+exclude = [
+    "c/",
+    "cpp/",
+    "ffi/",
+    "build/",
+    "dist/",
+    "pkg/",
+    "scripts/",
+    ".github/",
+    ".vscode/",
+    ".cargo/",
+    "src/bin/",
+    "AGENTS.md",
+]
 
 [features]
 web-wasm = []
