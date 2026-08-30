@@ -8,7 +8,8 @@ Left-hand traffic area classifier for `Point`, `Line`, and `Bbox` queries over w
 | --- | --- | --- |
 | Library | `cargo test` / `cargo build` | Core Rust classifier API |
 | CLI | `cargo run -- point <lat> <lon>` | Query a point, line, or bbox from the terminal |
-| web | `cargo web` | Generates `dist/gauche-wasm-map.html` |
+| web | `cargo web` | Generates `dist/gauche-wasm-map.html` and refreshes `pkg/gauche_rs.wasm` |
+| npm | `cd pkg && npm publish` | Publishes the `gauche-rs` WASM package (run `cargo web` first) |
 | bench | `cargo bench` | Runs the root `ffi-vs-rust` and `queries` Criterion benches |
 | FFI wasm | `cargo build --manifest-path ffi/Cargo.toml --target wasm32-unknown-unknown --release` | Opaque-handle wasm API for C/C++ consumers |
 | generate-c | `cargo generate-c` | Regenerate checked-in `c/gauche_ffi.c` and `c/gauche_ffi.h` from wasm via w2c2 |
@@ -75,6 +76,7 @@ target_link_libraries(my_app PRIVATE gauche::gauche_cpp)
 
 - `preprocessed/bitmap.bin` stores the 0.1° bitmap used at runtime.
 - `dist/gauche-wasm-map.html` is the generated web artifact.
+- `pkg/` is the npm package: hand-written `gauche.js`/`gauche.d.ts` over the generated `gauche_rs.wasm`.
 - `c/gauche_ffi.c`, `c/gauche_ffi.h`, and `c/w2c2/w2c2/` are checked in and regenerated from the wasm FFI target.
 
 ## Layout

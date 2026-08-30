@@ -1,0 +1,45 @@
+{
+  "name": "gauche-rs",
+  "version": "0.1.0",
+  "description": "Left-hand traffic area classifier for point, line, and bbox queries over OSM driving-side data (WebAssembly)",
+  "type": "module",
+  "main": "./gauche.js",
+  "types": "./gauche.d.ts",
+  "exports": {
+    ".": {
+      "types": "./gauche.d.ts",
+      "default": "./gauche.js"
+    },
+    "./gauche_rs.wasm": "./gauche_rs.wasm",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "gauche.js",
+    "gauche.d.ts",
+    "gauche_rs.wasm",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "BSD-2-Clause",
+  "author": "Project OSRM",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Project-OSRM/gauche-rs.git"
+  },
+  "homepage": "https://github.com/Project-OSRM/gauche-rs#readme",
+  "bugs": {
+    "url": "https://github.com/Project-OSRM/gauche-rs/issues"
+  },
+  "keywords": [
+    "osrm",
+    "routing",
+    "traffic",
+    "left-hand-traffic",
+    "driving-side",
+    "wasm",
+    "webassembly",
+    "geo",
+    "gis"
+  ]
+}

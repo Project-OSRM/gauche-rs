@@ -156,6 +156,7 @@ impl DrivingAreaIndex {
 
     #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
     #[unsafe(no_mangle)]
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub extern "C" fn classify_line_wasm(coords: *const f64, point_count: u32) -> i32 {
         if coords.is_null() || point_count == 0 {
             return -1;
@@ -173,6 +174,40 @@ impl DrivingAreaIndex {
             Ok(Classification::No) => 0,
             Ok(Classification::Partially) => 2,
             Err(_) => -1,
+        }
+    }
+
+    /// Allocate `bytes` of scratch space in the wasm linear memory so a JS caller
+    /// can hand coordinate data to [`Self::classify_line_wasm`]. Returns null if the
+    /// request is empty or the allocation fails. The caller must release the pointer
+    /// with [`Self::gauche_free`] using the same `bytes` value.
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
+    #[unsafe(no_mangle)]
+    pub extern "C" fn gauche_alloc(bytes: u32) -> *mut u8 {
+        if bytes == 0 {
+            return core::ptr::null_mut();
+        }
+        // Align to f64, the element type the coordinate buffer is read back as.
+        match std::alloc::Layout::from_size_align(bytes as usize, align_of::<f64>()) {
+            Ok(layout) => unsafe { std::alloc::alloc(layout) },
+            Err(_) => core::ptr::null_mut(),
+        }
+    }
+
+    /// Release a pointer previously returned by [`Self::gauche_alloc`].
+    ///
+    /// # Safety
+    /// `ptr` must come from [`Self::gauche_alloc`] and `bytes` must match the value
+    /// used to allocate it.
+    #[cfg(all(target_arch = "wasm32", feature = "web-wasm"))]
+    #[unsafe(no_mangle)]
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
+    pub extern "C" fn gauche_free(ptr: *mut u8, bytes: u32) {
+        if ptr.is_null() || bytes == 0 {
+            return;
+        }
+        if let Ok(layout) = std::alloc::Layout::from_size_align(bytes as usize, align_of::<f64>()) {
+            unsafe { std::alloc::dealloc(ptr, layout) }
         }
     }
 
