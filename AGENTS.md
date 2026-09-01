@@ -30,7 +30,7 @@ This repository builds and ships `gauche-rs`: a left-hand-driving classifier wit
 ## Canonical commands
 
 - `cargo web` → generates `dist/gauche-wasm-map.html`
-- `cargo generate-c` → regenerates `c/gauche_ffi.c`, `c/gauche_ffi.h`, and runtime files under `c/w2c2/w2c2/`
+- `cargo generate-c` → regenerates `c/gauche_ffi.c`, `c/gauche_ffi.h`, and the w2c2 runtime header `c/w2c2/w2c2/w2c2_base.h`
 - `cargo release-all` → release build + `generate-c` + `web`
 - `cargo bench` → runs `ffi-vs-rust` and `queries`
 
@@ -59,7 +59,7 @@ If source changes impact generated outputs, regenerate and include them in the s
 - `c/gauche_ffi.c`
 - `c/gauche_ffi.h`
 - `c/s*.c` / `c/d*.c` (generated chunks)
-- `c/w2c2/w2c2/*` (runtime headers/sources when refreshed)
+- `c/w2c2/w2c2/w2c2_base.h` (header-only w2c2 runtime, when refreshed)
 - `dist/gauche-wasm-map.html`
 
 ## PR checklist

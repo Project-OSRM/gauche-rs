@@ -77,7 +77,7 @@ target_link_libraries(my_app PRIVATE gauche::gauche_cpp)
 - `preprocessed/bitmap.bin` stores the 0.1° bitmap used at runtime.
 - `dist/gauche-wasm-map.html` is the generated web artifact.
 - `pkg/` is the npm package: hand-written `gauche.js`/`gauche.d.ts` over the generated `gauche_rs.wasm`.
-- `c/gauche_ffi.c`, `c/gauche_ffi.h`, and `c/w2c2/w2c2/` are checked in and regenerated from the wasm FFI target.
+- `c/gauche_ffi.c`, `c/gauche_ffi.h`, and `c/w2c2/w2c2/w2c2_base.h` are checked in and regenerated from the wasm FFI target.
 
 ## Layout
 
