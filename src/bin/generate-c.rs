@@ -124,40 +124,16 @@ fn copy_generated_artifacts(helper_root: &Path, root: &Path) -> Result<(), Box<d
             fs::copy(&path, output_dir.join(name))?;
         }
     }
-    let runtime_src = helper_root.join("w2c2-rs/w2c2-sys/w2c2/w2c2");
+    // The generated sources include exactly one w2c2 file, the header-only
+    // runtime. The rest of that repository is the wasm-to-C translator, which is
+    // only needed here at generation time, so it is not vendored.
+    let runtime_src = helper_root.join("w2c2-rs/w2c2-sys/w2c2/w2c2/w2c2_base.h");
+    if !runtime_src.exists() {
+        return Err(format!("missing w2c2 runtime header: {}", runtime_src.display()).into());
+    }
     let runtime_dst = output_dir.join("w2c2/w2c2");
-    copy_tree(&runtime_src, &runtime_dst)?;
-    Ok(())
-}
-
-fn copy_tree(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
-    if !src.exists() {
-        return Err(format!("missing w2c2 runtime tree: {}", src.display()).into());
-    }
-    fs::create_dir_all(dst)?;
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-        let path = entry.path();
-        let dest = dst.join(entry.file_name());
-        if path.is_dir() {
-            copy_tree(&path, &dest)?;
-            continue;
-        }
-        let Some(ext) = path.extension().and_then(|ext| ext.to_str()) else {
-            continue;
-        };
-        if ext != "c" && ext != "h" {
-            continue;
-        }
-        if path
-            .file_name()
-            .and_then(|name| name.to_str())
-            .is_some_and(|name| name.contains("test") || name == "main.c")
-        {
-            continue;
-        }
-        fs::copy(&path, &dest)?;
-    }
+    fs::create_dir_all(&runtime_dst)?;
+    fs::copy(&runtime_src, runtime_dst.join("w2c2_base.h"))?;
     Ok(())
 }
 
