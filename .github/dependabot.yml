@@ -4,8 +4,20 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      semver-major-days: 7
+      semver-minor-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
 
   - package-ecosystem: cargo
     directory: /ffi
     schedule:
       interval: weekly
+    cooldown:
+      semver-major-days: 7
+      semver-minor-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
