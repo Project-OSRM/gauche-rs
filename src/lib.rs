@@ -414,9 +414,26 @@ struct Polygon {
     max_lat: f64,
 }
 
+/// Slack on the bounds tests, so a point sitting exactly on a boundary is never
+/// rejected by rounding before the exact test gets to see it.
+const BOUNDS_EPSILON: f64 = 1e-9;
+
 impl Polygon {
     fn lat_bounds(&self) -> (f64, f64) {
         (self.min_lat, self.max_lat)
+    }
+
+    /// Cheap reject for a segment, on latitude alone.
+    ///
+    /// Only latitude, and only for segments. A ring's edges are great circle
+    /// arcs that bulge away from the chord between their endpoints, so the
+    /// spherical interior reaches outside the box its vertices span and a point
+    /// cannot be rejected on those bounds: doing so changes the answer for
+    /// points in the bulge, 1740 of 129000 sampled. For a query segment the
+    /// bulge is bounded by the arc's own length, which the caller adds, and
+    /// latitude is the one axis where that bound holds everywhere.
+    fn lat_band_overlaps(&self, low: f64, high: f64) -> bool {
+        high >= self.min_lat - BOUNDS_EPSILON && low <= self.max_lat + BOUNDS_EPSILON
     }
 
     fn candidate_cols(&self) -> Vec<usize> {
@@ -776,7 +793,18 @@ fn segment_intersects_any_boundary(
 ) -> Result<bool, Error> {
     let va = Vec3::from_point(a);
     let vb = Vec3::from_point(b);
+    // Every point on the minor arc is within the arc's own angular length of
+    // either endpoint, so widening the endpoints' latitude span by that much
+    // covers the bulge. For the short segments of an OSM way this is a fraction
+    // of a degree and rejects almost every ring; for a long one it grows until
+    // nothing is rejected, which is the behaviour without this test at all.
+    let arc_degrees = va.dot(vb).clamp(-1.0, 1.0).acos().to_degrees();
+    let low = a.lat.min(b.lat) - arc_degrees;
+    let high = a.lat.max(b.lat) + arc_degrees;
     for poly in polygons {
+        if !poly.lat_band_overlaps(low, high) {
+            continue;
+        }
         let verts = &poly.spherical_vertices;
         for i in 0..verts.len() {
             let c = verts[i];
