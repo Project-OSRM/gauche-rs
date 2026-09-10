@@ -46,6 +46,11 @@ void write_f64(U8* dst, double value) {
 struct Index::Impl {
     gauche_ffiInstance* instance = nullptr;
     U32 handle = 0;
+    // Scratch lives above the guest's own memory and is rewound before every
+    // query. Without the rewind each call would bump the pointer for good, so a
+    // caller classifying a whole planet's worth of ways grows guest memory until
+    // it dies.
+    U32 scratch_base = 0;
     U32 scratch_next = 0;
 
     Impl() {
@@ -60,7 +65,8 @@ struct Index::Impl {
             instance = nullptr;
             throw std::runtime_error("failed to create gauche instance");
         }
-        scratch_next = gauche_ffi_memory(instance)->size;
+        scratch_base = gauche_ffi_memory(instance)->size;
+        scratch_next = scratch_base;
     }
 
     ~Impl() {
@@ -72,6 +78,8 @@ struct Index::Impl {
             std::free(instance);
         }
     }
+
+    void rewind_scratch() { scratch_next = scratch_base; }
 
     U32 allocate(std::size_t bytes, std::size_t alignment) {
         auto* memory = gauche_ffi_memory(instance);
@@ -120,6 +128,7 @@ std::unique_ptr<Index> Index::create() {
 }
 
 QueryResult Index::classify_point(Point point) const {
+    impl_->rewind_scratch();
     const U32 out = impl_->store_classification_slot();
     const U32 status = gauche_ffi_gauche_classify_point(
         impl_->instance,
@@ -137,6 +146,7 @@ QueryResult Index::classify_line(std::span<const Point> line) const {
     if (line.empty()) {
         return {Status::InvalidInput, Classification::No};
     }
+    impl_->rewind_scratch();
     const U32 coords = impl_->store_points(line);
     const U32 out = impl_->store_classification_slot();
     const U32 status = gauche_ffi_gauche_classify_line(
@@ -152,6 +162,7 @@ QueryResult Index::classify_line(std::span<const Point> line) const {
 }
 
 QueryResult Index::classify_bbox(Bbox bbox) const {
+    impl_->rewind_scratch();
     const U32 out = impl_->store_classification_slot();
     const U32 status = gauche_ffi_gauche_classify_bbox(
         impl_->instance,
